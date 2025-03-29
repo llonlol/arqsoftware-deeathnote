@@ -1,0 +1,31 @@
+extends layouts/login-layout.pug
+
+block content
+    .loginContainer
+        h1 Registrarse
+        form#registerform(method="post",onsubmit="event.preventDefault();validateform();") 
+
+            p.errorMessage #{errorMessage}
+
+             input(type="text", name="firstName", placeholder="Nombre",value=firstName required="")
+             input(type="text", name="lastName", placeholder="Apellido",value=lastName required="")
+             input(type="text", name="username", placeholder="Nombre de Usuario",value=username required="")
+             input(type="email", name="email", placeholder="Correo Electrónico",value=email required="")
+             input#password(type="password", name="password", placeholder="Contraseña",required="")
+             input#passwordconf(type="password", name="passwordconf", placeholder="Confirmar Contraseña",required="")
+             input(type="submit", value="Registrarse")
+        a(href="/login") ¿Ya tienes cuenta? Inicia sesión.
+
+    script.
+        var passwordfield = document.getElementById("password")
+        var passwordconfirmfield = document.getElementById("passwordconf")
+        var form = document.getElementById("registerform")
+
+        function validateform(){
+            if(passwordfield.value!=passwordconfirmfield.value){
+                alert("Las contraseñas no coinciden. Porfavor, intentalo denuevo.")
+            }
+            else{
+                form.submit()
+            }
+        }
