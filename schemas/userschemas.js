@@ -9,6 +9,8 @@ const userschema=new Schema({
     email:{type:String,required:true,trim:true,unique:true},
     password:{type:String,required:true,trim:true},
     profilePic:{type:String,default:"/images/profilePic.png"},
+    likes:[{type:Schema.Types.ObjectId,ref:'Post'}],
+    retweets:[{type:Schema.Types.ObjectId,ref:'Post'}]
 },{timestamps:true});
 
 var User = mongoose.model('User',userschema);
