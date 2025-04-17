@@ -1,0 +1,78 @@
+extends layouts/login-layout.pug
+
+block content
+    .loginContainer
+        h1 Registrar Persona Fallecida
+        form#registerform(method="post", enctype="multipart/form-data", onsubmit="event.preventDefault();validateform();") 
+
+            p.errorMessage #{errorMessage}  
+
+            input(type="text", name="Nombre", placeholder="Nombre Completo", value=Nombre required="")
+
+            // Botón para mostrar el campo de texto de causa de muerte
+            button(type="button", id="specifyDeathButton") Especificar muerte
+
+            // Campo de texto oculto para la causa de la muerte
+            textarea(id="CausaMuerte", name="CausaMuerte", placeholder="Causa de Muerte (opcional)", maxlength="500", style="display: none;") #{CausaMuerte}
+
+            input(type="file", name="Foto", accept="image/*")
+
+            input(type="submit", id="submitButton", value="Asesinar")
+        a(href="/") Cerrar Libreta
+
+        // Mensaje de confirmación
+        p#successMessage(style="display: none; color: green;") ¡Registro exitoso!
+
+    script.
+        let timer; // Temporizador
+        let timerExpired = false; // Variable para saber si el temporizador expiró
+        const timeLimit = 30; // 30 segundos (de momento, para los 6:40 es (60*6) +40)
+        const specifyDeathButton = document.getElementById("specifyDeathButton");
+        const causaMuerteField = document.getElementById("CausaMuerte");
+        const submitButton = document.getElementById("submitButton");
+        const successMessage = document.getElementById("successMessage");
+        const registerForm = document.getElementById("registerform");
+
+        // Mostrar el campo de texto y comenzar el temporizador al hacer clic en "Especificar muerte"
+        specifyDeathButton.addEventListener("click", () => {
+            causaMuerteField.style.display = "block"; // Mostrar el campo de texto
+            specifyDeathButton.style.display = "none"; // Ocultar el botón
+
+            // Iniciar el temporizador
+            clearTimeout(timer); // Reinicia el temporizador si ya estaba corriendo
+            timerExpired = false; // Reinicia el estado del temporizador
+            timer = setTimeout(() => {
+                timerExpired = true; // Marca que el temporizador expiró
+                causaMuerteField.value = "Ataque al corazón"; // Establece el valor predeterminado
+            }, timeLimit * 1000); // Convierte el tiempo a milisegundos
+        });
+
+        // Validar el formulario al presionar "Asesinar"
+        async function validateform() {
+            clearTimeout(timer); // Detener el temporizador
+            if (timerExpired) {
+                // Si el temporizador expiró, forzar el valor predeterminado
+                causaMuerteField.value = "Ataque al corazón";
+            }
+
+            // Enviar los datos del formulario mediante una solicitud AJAX
+            const formData = new FormData(registerForm);
+            try {
+                const response = await fetch(registerForm.action, {
+                    method: "POST",
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    successMessage.style.display = "block"; // Mostrar mensaje de éxito
+                    registerForm.reset(); // Limpiar el formulario
+                    specifyDeathButton.style.display = "block"; // Volver a mostrar el botón "Especificar muerte"
+                    causaMuerteField.style.display = "none"; // Ocultar el campo de texto
+                } else {
+                    alert("Hubo un error al registrar la muerte. Inténtalo de nuevo.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Hubo un error al registrar la muerte. Inténtalo de nuevo.");
+            }
+        }
